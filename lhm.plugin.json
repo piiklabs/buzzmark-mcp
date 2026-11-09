@@ -1,0 +1,919 @@
+{
+  "identifier": "buzzmark",
+  "name": "Buzzmark",
+  "version": "1.1.0",
+  "description": "A ghostwriter that writes, plans and schedules social media posts in your business's own voice, for Instagram, LinkedIn, Facebook, X, Threads and TikTok. Nothing posts right away: your AI app saves drafts and schedules them on your Buzzmark calendar.",
+  "author": "Piik Labs AB",
+  "authorUrl": "https://buzzmark.ai",
+  "homepage": "https://buzzmark.ai",
+  "icon": "https://buzzmark.ai/apple-icon",
+  "cloudEndpoint": "https://buzzmark.ai/mcp",
+  "tags": [
+    "social-media",
+    "content-scheduling",
+    "linkedin",
+    "instagram",
+    "marketing"
+  ],
+  "tools": [
+    {
+      "name": "list_social_sets",
+      "title": "List social sets",
+      "description": "The user's social sets: each is a group of connected social accounts with its own Hive profile (brand voice), time zone and weekly posting slots. Start here: most other tools take a social_set_id and account ids from this answer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_brand_profiles",
+      "title": "List brand profiles",
+      "description": "The user's brand profiles (Buzzmark calls them Hive profiles): what Buzzmark knows about each brand, its voice, tone, audience and products. Writing tools write in a brand profile's voice; pass its id as hive_profile_id, or leave it out to use the social set's own.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_posts",
+      "title": "List posts",
+      "description": "Buzzes in Buzzmark, newest first: drafts, scheduled, published or failed. Text is cut to 400 characters; get_post gives the whole Buzz.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "default": "all",
+            "type": "string",
+            "enum": [
+              "draft",
+              "scheduled",
+              "published",
+              "failed",
+              "all"
+            ]
+          },
+          "social_set_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "limit": {
+            "default": 20,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 50
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_post",
+      "title": "Get a post",
+      "description": "One Buzz in full: every part of a thread, its pictures, its first comment, the accounts it goes to, its status and time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "post_id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "write_posts",
+      "title": "Write posts in the brand's voice",
+      "description": "Buzz writes 1 to 5 new posts from an idea, in a Hive profile's voice, with Buzzmark's writing rules and its after-check. Every answer is kept in the user's Library in Buzzmark. Nothing is saved as a draft: pass the text you want to save_draft.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "idea": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 2000,
+            "description": "What the posts are about, in the user's words."
+          },
+          "hive_profile_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "social_set_id": {
+            "description": "Social set whose Hive profile writes the posts, when hive_profile_id is left out. Optional when the account has one set.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "platform": {
+            "description": "Buzzmark platform id (x, linkedin, instagram, threads, facebook, tiktok, bluesky) to write for.",
+            "type": "string"
+          },
+          "format": {
+            "default": "post",
+            "type": "string",
+            "enum": [
+              "post",
+              "thread"
+            ]
+          },
+          "count": {
+            "default": 3,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "with_picture_brief": {
+            "default": false,
+            "description": "Add a brief for a picture to each post, for create_image.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "idea"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "save_draft",
+      "title": "Save a draft",
+      "description": "Creates a Buzz draft, or updates one (post_id). A draft stays a draft: nothing is posted or scheduled. Give text for one post, or thread for several. Says what a platform would refuse (length, a missing picture, a LinkedIn tag LinkedIn can't find) so it can be fixed before schedule_post. Tagging: on X, Threads, Instagram and TikTok write @handle. On LinkedIn write the profile or page link in brackets, @[https://www.linkedin.com/company/<slug>] or @[https://www.linkedin.com/in/<id>], and LinkedIn shows its own name for it; every other platform gets that name as plain text. On Facebook a mention stays plain text. A brand profile with accounts (list_brand_profiles shows them) needs none of that: write its name, and when the post is scheduled its first mention is tagged on each platform it has an account on. first_comment adds a comment posted under the post the moment it goes out, on LinkedIn, Instagram, Facebook and Threads: the place for a link or the hashtags, so the post itself stays clean.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "description": "Update this draft instead of making a new one.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "text": {
+            "type": "string",
+            "maxLength": 10000
+          },
+          "thread": {
+            "description": "A thread: one string per post. Replaces text.",
+            "minItems": 1,
+            "maxItems": 25,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 5000
+            }
+          },
+          "social_set_id": {
+            "description": "Social set id from list_social_sets. Optional when the account has one set.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "hive_profile_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "account_ids": {
+            "description": "Accounts it goes to, first one leading. Default: the set's default accounts.",
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            }
+          },
+          "first_comment": {
+            "description": "A comment posted under the post right after it goes out, on LinkedIn, Instagram (not a story), Facebook and Threads; other platforms leave it out. At most 500 characters on Threads, 1,250 on LinkedIn, 2,200 on Instagram, 5,000 on Facebook. An empty string removes it; leave it out to keep the draft's comment as it is.",
+            "type": "string",
+            "maxLength": 5000
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "schedule_post",
+      "title": "Schedule a post",
+      "description": "Schedules a draft for a time, or for the social set's next free posting slot. Never posts right away. Times are on the set's clock unless they carry an offset. When the set has natural times on (list_social_sets says), the post goes out a few minutes either way of the time named; the answer says the real time. When the person's role in their organization needs an approval first, the draft is sent for approval instead (sent_for_approval in the answer) and goes out once a teammate approves it. For several drafts at once, use schedule_posts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "when": {
+            "type": "string",
+            "description": "\"next_slot\", or a date and time: \"2026-10-02T09:00\" on the set's clock, or ISO 8601 with an offset."
+          },
+          "account_ids": {
+            "description": "Default: the accounts saved on the draft, else the set's default accounts.",
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991
+            }
+          }
+        },
+        "required": [
+          "post_id",
+          "when"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "schedule_posts",
+      "title": "Schedule several posts",
+      "description": "Schedules up to 25 drafts in one go, each at its own time or the next free slot, for example the drafts create_weekly_content_plan saved (each one's date and time is its slot). Never posts right away. Each draft is checked on its own: one that can't go out is reported and the others are still scheduled. When the person's role needs an approval first, the drafts are sent for approval instead.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "posts": {
+            "minItems": 1,
+            "maxItems": 25,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "post_id": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "when": {
+                  "type": "string",
+                  "description": "\"next_slot\", or a date and time: \"2026-10-02T09:00\" on the set's clock, or ISO 8601 with an offset."
+                },
+                "account_ids": {
+                  "description": "Default: the accounts saved on the draft, else the set's default accounts.",
+                  "maxItems": 20,
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "exclusiveMinimum": 0,
+                    "maximum": 9007199254740991
+                  }
+                }
+              },
+              "required": [
+                "post_id",
+                "when"
+              ]
+            },
+            "description": "Each draft with its time (post_id, when, optional account_ids)."
+          }
+        },
+        "required": [
+          "posts"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "reschedule_post",
+      "title": "Move a scheduled post",
+      "description": "Moves a scheduled post to a new date and time on the set's clock, kept exactly. Never posts right away. The words, pictures and accounts stay as they are.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "when": {
+            "type": "string",
+            "description": "A date and time: \"2026-10-02T09:00\" on the set's clock, or ISO 8601 with an offset."
+          }
+        },
+        "required": [
+          "post_id",
+          "when"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "unschedule_post",
+      "title": "Take a post off the schedule",
+      "description": "Takes a scheduled post off the calendar and back to the drafts, with its text, pictures and accounts, so it can be edited or scheduled again. Nothing is deleted. Pictures the posting queue held are copied into Buzzmark first; if one can't be, the post stays scheduled.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "post_id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "delete_draft",
+      "title": "Delete a draft",
+      "description": "Deletes a draft for good. A scheduled or published post can't be deleted here: take a scheduled one back to drafts with unschedule_post first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "post_id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "check_post",
+      "title": "Check a post against the brand voice",
+      "description": "Scores a post 0 to 100 on how much it sounds like the brand, with a short verdict, the one thing that works or drifts, and up to three edits that would raise the score, each as the whole post rewritten. Checks any text, including text written in this chat, or a draft (post_id), whose score is kept beside it in Buzzmark. Changes nothing in the post.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "description": "The post to check. Leave out to check the draft named by post_id.",
+            "type": "string",
+            "maxLength": 10000
+          },
+          "post_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "platform": {
+            "description": "Buzzmark platform id the post is for. Default: the draft's first account.",
+            "type": "string"
+          },
+          "hive_profile_id": {
+            "description": "Brand profile id from list_brand_profiles. Default: the social set's own.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "social_set_id": {
+            "description": "Social set id from list_social_sets. Optional when the account has one set.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "rewrite_post",
+      "title": "Rewrite a post",
+      "description": "Buzz rewrites a post one way and answers up to three versions to pick from, in the brand's voice and with Buzzmark's writing rules. Nothing is saved: pass the version the user picks to save_draft. Actions: match_hive (sound like the brand), fix_grammar (spelling and grammar only), sharpen (clearer, tighter), sting (more punch), trim (about half the length), remix (fresh words), expand (one concrete detail more), structure (short lines, easy to scan), warmer, thread_hook (the opening post of a thread), emoji, emoji_bullets, announcement (framed as news), for_platform (rewritten the way the platform reads), custom (follow the user's instruction).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "match_hive",
+              "fix_grammar",
+              "sharpen",
+              "sting",
+              "trim",
+              "remix",
+              "expand",
+              "structure",
+              "warmer",
+              "thread_hook",
+              "emoji",
+              "emoji_bullets",
+              "announcement",
+              "for_platform",
+              "custom"
+            ]
+          },
+          "text": {
+            "description": "The post to rewrite. Leave out to rewrite a draft's part (post_id, part).",
+            "type": "string",
+            "maxLength": 10000
+          },
+          "post_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "part": {
+            "default": 0,
+            "description": "Which post of a thread, from 0.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 24
+          },
+          "platform": {
+            "description": "Buzzmark platform id. Needed for for_platform; otherwise it sets the length the rewrite keeps to.",
+            "type": "string"
+          },
+          "instruction": {
+            "description": "For custom: how to rewrite it, in the user's words.",
+            "type": "string",
+            "maxLength": 600
+          },
+          "hive_profile_id": {
+            "description": "Brand profile id from list_brand_profiles. Default: the social set's own.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "social_set_id": {
+            "description": "Social set id from list_social_sets. Optional when the account has one set.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "action"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "adapt_for_platforms",
+      "title": "Give a draft a version per platform",
+      "description": "Rewrites a draft the way each platform it goes to reads it (or the platforms named), and saves those versions on the draft, as Spread does in the app: the draft's first account keeps the post itself, every other platform gets its own text, with the same pictures. A version saved before for one of those platforms is replaced. Works on a single post, not a thread. A LinkedIn version keeps LinkedIn tags as @[link]; the answer warns about any LinkedIn can't find.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "post_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "platforms": {
+            "description": "Buzzmark platform ids among the draft's accounts. Default: every platform after the first account's.",
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "post_id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_post_ideas",
+      "title": "Post ideas from the news and competitors",
+      "description": "Post ideas for a brand from Buzzmark's Scout: this week's news in its sector, each topic with why it matters now, its sources and two or three angles to post, plus angles from its competitors when Scout has read them. Answers Scout's latest read with its date. With refresh, or when Scout has never read the news for this brand, it reads the news again first (up to a minute, counted as one Scout run). Ideas only: write them up with write_posts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "social_set_id": {
+            "description": "Social set id from list_social_sets. Optional when the account has one set.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "hive_profile_id": {
+            "description": "Brand profile id from list_brand_profiles. Default: the social set's own.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "refresh": {
+            "default": false,
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "get_insights",
+      "title": "What worked this month",
+      "description": "What a brand's posts from the last 30 days say, as a few findings and moves in plain sentences, each with the number it stands on (for example, posts that open with a question got twice the engagement) and an idea to act on. Read at most once a day: the same answer comes back until the numbers move. Needs enough posts with numbers, and says how many more when there aren't.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "social_set_id": {
+            "description": "Social set id from list_social_sets. Optional when the account has one set.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "hive_profile_id": {
+            "description": "Brand profile id from list_brand_profiles. Default: the social set's own.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_best_times",
+      "title": "Best times to post",
+      "description": "When a social set's own posts have done best: average likes, comments, shares and saves per post in each weekday and hour, on the set's clock. Needs published posts to say anything.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "social_set_id": {
+            "description": "Social set id from list_social_sets. Optional when the account has one set.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "days": {
+            "default": 90,
+            "type": "integer",
+            "minimum": 14,
+            "maximum": 180
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_post_stats",
+      "title": "How recent posts did",
+      "description": "A social set's published posts from the last days with their numbers, best first. Only numbers a platform reports are shown.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "social_set_id": {
+            "description": "Social set id from list_social_sets. Optional when the account has one set.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "days": {
+            "default": 30,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 180
+          },
+          "limit": {
+            "default": 10,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 30
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "create_image",
+      "title": "Make a picture",
+      "description": "Makes a picture with Buzzmark's image model and keeps it in the user's Library. With post_id it's also added to that draft. The picture takes the Hive profile's colours, and a named Hive product brings its real photo as the reference. Uses one of the month's picture credits; a failed or refused picture isn't counted. Takes about a minute.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3000,
+            "description": "What the picture shows. A photograph by default."
+          },
+          "hive_profile_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "product": {
+            "description": "A product name exactly as the Hive profile lists it, to use its photo.",
+            "type": "string",
+            "maxLength": 200
+          },
+          "platforms": {
+            "description": "Where it goes, for the shape (Instagram and Threads 4:5, TikTok 2:3, else square). Default: the draft's platforms.",
+            "maxItems": 8,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "post_id": {
+            "description": "A draft to add the picture to.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "part": {
+            "default": 0,
+            "description": "Which post of a thread, from 0.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 24
+          }
+        },
+        "required": [
+          "prompt"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "add_media_from_url",
+      "title": "Add a picture or video from a link",
+      "description": "Copies a picture or video from a public https link into the user's Library in Buzzmark, and with post_id adds it to that draft. Buzzmark keeps its own copy, so the post never depends on the link staying up. Takes JPG, PNG, WebP, GIF, MP4 or MOV: pictures up to 10 MB, videos up to 200 MB. Says what a platform would refuse, like create_image does.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "maxLength": 2000,
+            "format": "uri",
+            "description": "A public https link straight to the file, not to a page that shows it."
+          },
+          "post_id": {
+            "description": "A draft to add it to. Without one it goes to the Library only.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "part": {
+            "default": 0,
+            "description": "Which post of a thread, from 0.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 24
+          }
+        },
+        "required": [
+          "url"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "create_upload_link",
+      "title": "Get an upload link",
+      "description": "For a picture or video the user has on their own computer or phone, not at a public link. Answers two ways in, both good for one file: upload_page, a Buzzmark page to send the user, where they pick the file and it goes straight onto the draft (pass post_id); and, with file_name, upload_url, for an app that can read the file itself (a terminal or a file system): PUT the file's bytes there with the Content-Type header the answer gives, then call add_uploaded_media with upload_id. Takes JPG, PNG, WebP, GIF, MP4 or MOV: pictures up to 10 MB, videos up to 200 MB.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "file_name": {
+            "description": "The file's name with its ending, like \"launch.png\", when this app uploads the file itself. Leave it out to only get the page for the user.",
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 120
+          },
+          "post_id": {
+            "description": "A draft to add the file to. Without one it goes to the Library only.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "part": {
+            "default": 0,
+            "description": "Which post of a thread, from 0.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 24
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "add_uploaded_media",
+      "title": "Add an uploaded picture or video",
+      "description": "After the file was PUT to create_upload_link's upload_url: copies it into the user's Library in Buzzmark, and with post_id adds it to that draft. Says what a platform would refuse, like add_media_from_url does. An upload_id works for 55 minutes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "upload_id": {
+            "type": "string",
+            "minLength": 40,
+            "maxLength": 2000,
+            "description": "upload_id from create_upload_link."
+          },
+          "post_id": {
+            "description": "A draft to add it to. Without one it goes to the Library only.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "part": {
+            "default": 0,
+            "description": "Which post of a thread, from 0.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 24
+          }
+        },
+        "required": [
+          "upload_id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "add_media_from_chat",
+      "title": "Add a picture or video from this chat",
+      "description": "A picture or video the user attached in this chat: copies it into their Library in Buzzmark, and with post_id adds it to that draft. Says what a platform would refuse. Takes JPG, PNG, WebP, GIF, MP4 or MOV: pictures up to 10 MB, videos up to 200 MB.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "file": {
+            "type": "object",
+            "properties": {
+              "download_url": {
+                "type": "string",
+                "maxLength": 4000,
+                "format": "uri",
+                "description": "The attachment's download link."
+              },
+              "file_id": {
+                "type": "string",
+                "maxLength": 200,
+                "description": "The attachment's id."
+              },
+              "mime_type": {
+                "description": "The attachment's type.",
+                "type": "string",
+                "maxLength": 100
+              },
+              "file_name": {
+                "description": "The attachment's name.",
+                "type": "string",
+                "maxLength": 255
+              }
+            },
+            "required": [
+              "download_url",
+              "file_id"
+            ],
+            "description": "The file the user attached in the chat."
+          },
+          "post_id": {
+            "description": "A draft to add it to. Without one it goes to the Library only.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "part": {
+            "default": 0,
+            "description": "Which post of a thread, from 0.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 24
+          }
+        },
+        "required": [
+          "file"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "create_weekly_content_plan",
+      "title": "Plan the week",
+      "description": "A plan for a social set's next 7 days: what the week is for, 2 to 4 content pillars, and one ready-to-edit post per posting slot, each with its day, time, platform, a picture idea and why it's there. Built from the set's Hive profile, its posting slots, its best times and how recent posts did, and what's already scheduled. Needs a connected account; with fewer than 8 published posts with numbers it leans on the brand's voice and the platforms' norms, and says so. Kept in the Library. Ask the user first whether they want the posts as drafts: with save_as_drafts every post also becomes a draft, and schedule_posts then puts them all on their slots in one go. Each planned post counts as one Buzz written for you. Takes up to a minute.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "social_set_id": {
+            "description": "Social set id from list_social_sets. Optional when the account has one set.",
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "goal": {
+            "description": "What the week should do, in the user's words: a launch, an event, more bookings.",
+            "type": "string",
+            "maxLength": 600
+          },
+          "start": {
+            "description": "First day, YYYY-MM-DD on the set's clock. Default: tomorrow.",
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+          },
+          "save_as_drafts": {
+            "default": false,
+            "type": "boolean"
+          }
+        }
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    }
+  ],
+  "resources": [],
+  "prompts": []
+}
