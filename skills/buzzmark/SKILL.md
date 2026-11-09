@@ -1,7 +1,7 @@
 ---
 name: buzzmark
 description: Write, plan and schedule social media posts in a business's own voice with Buzzmark's MCP server. Use when the user wants post ideas, posts for Instagram, LinkedIn, Facebook, X, Threads or TikTok, a week of posts planned around their best times, a check on how much a post sounds like their brand, or what worked this month.
-version: 1.0.0
+version: 1.0.2
 homepage: https://buzzmark.ai
 clawdis:
   primaryEnv: BUZZMARK_API_KEY
@@ -21,7 +21,7 @@ This skill connects your agent to Buzzmark's remote MCP server and tells it how 
 ## Setup
 
 1. Sign up at [buzzmark.ai/signup](https://buzzmark.ai/signup). New users get 7 days free. Connect at least one social account in Buzzmark.
-2. Add the MCP server `https://buzzmark.ai/mcp` (Streamable HTTP) to your agent.
+2. Add the MCP server `https://buzzmark.ai/mcp` (Streamable HTTP) to your agent. Claude and Claude Code use Claude's own address, `https://buzzmark.ai/mcp/claude`: it serves every tool except the two Claude can't use, `create_image` and `add_media_from_chat`.
    - Agents with OAuth sign in on their own the first time a tool runs: the user approves on a Buzzmark page. There is no key to copy.
    - Agents without OAuth send a personal API key as `Authorization: Bearer $BUZZMARK_API_KEY`. The user makes one on the [AI apps page](https://buzzmark.ai/app/ai-apps) and can revoke it there.
 3. Check the connection: call `list_social_sets`. It returns the user's social sets and their ids.
@@ -29,7 +29,7 @@ This skill connects your agent to Buzzmark's remote MCP server and tells it how 
 Claude Code:
 
 ```bash
-claude mcp add --transport http buzzmark https://buzzmark.ai/mcp
+claude mcp add --transport http buzzmark https://buzzmark.ai/mcp/claude
 ```
 
 Any app with an MCP config file:
@@ -72,7 +72,7 @@ Leave out `headers` when the app signs in with OAuth. Steps for Claude, ChatGPT,
 
 **Plan a week.** `create_weekly_content_plan` builds 7 days of posts from the set's slots, best times and history. Afterwards, offer to save the posts as drafts and schedule them.
 
-**See what worked.** `list_posts` and `get_post` read posts, `get_post_stats` gives a post's numbers, and `get_insights` says what worked this month.
+**See what worked.** `list_posts` and `get_post` read posts, `get_post_stats` lists a social set's recent published posts with their numbers, best first, and `get_insights` says what worked this month.
 
 ## What it can't do
 
