@@ -59,6 +59,12 @@ Steps for Claude, ChatGPT, Grok, Cursor and Claude Code are on [buzzmark.ai/ai-a
 npx skills add piiklabs/buzzmark-mcp --skill buzzmark
 ```
 
+Or from [ClawHub](https://clawhub.ai/buzzmark/skills/buzzmark) for OpenClaw:
+
+```bash
+openclaw skills install @buzzmark/buzzmark
+```
+
 ## What your AI app can do in your account
 
 Buzzmark never posts on the spot. Your AI app can save drafts and schedule, move or unschedule posts, and every scheduled post stays on your Buzzmark calendar, where you can change or remove it before it goes out.
