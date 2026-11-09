@@ -51,6 +51,14 @@ Any app that speaks MCP over Streamable HTTP connects with the same URL, `https:
 
 Steps for Claude, ChatGPT, Grok, Cursor and Claude Code are on [buzzmark.ai/ai-apps](https://buzzmark.ai/ai-apps).
 
+## Agent skill
+
+[`skills/buzzmark/SKILL.md`](skills/buzzmark/SKILL.md) teaches an AI agent to connect this server and use its tools well: which tool to start with, how to write in your brand's voice, first comments, tagging and scheduling. Install it with:
+
+```bash
+npx skills add piiklabs/buzzmark-mcp --skill buzzmark
+```
+
 ## What your AI app can do in your account
 
 Buzzmark never posts on the spot. Your AI app can save drafts and schedule, move or unschedule posts, and every scheduled post stays on your Buzzmark calendar, where you can change or remove it before it goes out.
