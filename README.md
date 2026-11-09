@@ -24,7 +24,7 @@ Every post is checked against Buzzmark's writing rules before you see it.
 
 ## Before you start
 
-You need a Buzzmark account with a plan and at least one social account connected in Buzzmark. New accounts get 7 days free at [buzzmark.ai](https://buzzmark.ai).
+You need a Buzzmark account with a plan and at least one social account connected in Buzzmark. New accounts get 7 days free: [sign up at buzzmark.ai](https://buzzmark.ai/signup).
 
 ## Connect
 
