@@ -3,14 +3,13 @@ name: buzzmark
 description: Write, plan and schedule social media posts in a business's own voice with Buzzmark's MCP server. Use when the user wants post ideas, posts for Instagram, LinkedIn, Facebook, X, Threads or TikTok, a week of posts planned around their best times, a check on how much a post sounds like their brand, or what worked this month.
 version: 1.0.0
 homepage: https://buzzmark.ai
-metadata:
-  openclaw:
-    primaryEnv: BUZZMARK_API_KEY
-    envVars:
-      - name: BUZZMARK_API_KEY
-        required: false
-        description: Personal Buzzmark API key, sent as a Bearer header by agents that can't sign in with OAuth. Made on the AI apps page in Buzzmark.
-    homepage: https://buzzmark.ai
+clawdis:
+  primaryEnv: BUZZMARK_API_KEY
+  envVars:
+    - name: BUZZMARK_API_KEY
+      required: false
+      description: Personal Buzzmark API key, sent as a Bearer header by agents that can't sign in with OAuth. Made on the AI apps page in Buzzmark.
+  homepage: https://buzzmark.ai
 ---
 
 # Buzzmark

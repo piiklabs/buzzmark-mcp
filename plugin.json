@@ -1,0 +1,23 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "buzzmark",
+  "version": "1.1.0",
+  "description": "Write, plan and schedule social media posts in your business's own voice for Instagram, LinkedIn, Facebook, X, Threads and TikTok. Nothing posts right away: drafts and scheduled posts stay on your Buzzmark calendar.",
+  "author": {
+    "name": "Piik Labs AB",
+    "url": "https://buzzmark.ai"
+  },
+  "homepage": "https://buzzmark.ai/ai-apps",
+  "repository": "https://github.com/piiklabs/buzzmark-mcp",
+  "license": "MIT",
+  "keywords": ["social-media", "scheduling", "content", "linkedin", "instagram", "mcp"],
+  "extensions": {
+    "com.nousresearch.hermes": {
+      "servers": {
+        "buzzmark": {
+          "trust": "untrusted"
+        }
+      }
+    }
+  }
+}
