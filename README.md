@@ -65,6 +65,35 @@ Or from [ClawHub](https://clawhub.ai/buzzmark/skills/buzzmark) for OpenClaw:
 openclaw skills install @buzzmark/buzzmark
 ```
 
+## Install in Hermes Agent
+
+This repository is also a portable Agent Plugins v1 package for [Hermes Agent](https://hermes-agent.nousresearch.com): `plugin.json`, `mcp.json` and the skill in `skills/buzzmark/`.
+
+```bash
+hermes plugins install buzzmark --enable
+```
+
+The first time Hermes uses a Buzzmark tool, your browser opens a Buzzmark page: sign in and allow it. Then ask Hermes: "What social accounts do I have in Buzzmark?"
+
+What the plugin does on your machine:
+
+- Every tool call goes to Buzzmark's hosted server at `buzzmark.ai` and acts on the Buzzmark account you sign in to. The tools come from that server, so they can change without a new version of this package.
+- Sign-in runs `mcp-remote@0.1.49` through `npx` (Node.js and npm required). It opens your browser and a local callback port the first time, and keeps the sign-in under `~/.mcp-auth`. There is no key in the package or in Hermes's config.
+- The package marks the server `untrusted`, so Hermes asks before every tool that isn't read-only (saving a draft, scheduling, making a picture) and refuses those in unattended runs. Writing posts and making pictures use your plan's monthly Buzz and pictures.
+- Nothing posts right away. Scheduled posts stay on your Buzzmark calendar, where you can change or remove them before they go out.
+- No code, binaries, telemetry or self-updater in the package.
+
+On a machine without a browser, skip the plugin and add the server to Hermes's `config.yaml` with a personal API key from the AI apps page in Buzzmark, kept in `~/.hermes/.env` as `BUZZMARK_API_KEY`:
+
+```yaml
+mcp_servers:
+  buzzmark:
+    url: "https://buzzmark.ai/mcp"
+    headers:
+      Authorization: "Bearer ${BUZZMARK_API_KEY}"
+    trust: untrusted
+```
+
 ## What your AI app can do in your account
 
 Buzzmark never posts on the spot. Your AI app can save drafts and schedule, move or unschedule posts, and every scheduled post stays on your Buzzmark calendar, where you can change or remove it before it goes out.
