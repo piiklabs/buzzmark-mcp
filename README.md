@@ -51,6 +51,17 @@ Any app that speaks MCP over Streamable HTTP connects with the same URL, `https:
 
 Steps for Claude, ChatGPT, Grok, Cursor and Claude Code are on [buzzmark.ai/ai-apps](https://buzzmark.ai/ai-apps).
 
+### From a terminal
+
+The [Buzzmark CLI](https://www.npmjs.com/package/buzzmark) runs every tool as a command, for agents and scripts that work in a shell. Put a personal API key from the AI apps page in `BUZZMARK_API_KEY`, then:
+
+```bash
+npx buzzmark list-social-sets
+npx buzzmark tools
+```
+
+Answers are JSON. Details: [docs.buzzmark.ai/ai-apps/cli](https://docs.buzzmark.ai/ai-apps/cli).
+
 ## Agent skill
 
 [`skills/buzzmark/SKILL.md`](skills/buzzmark/SKILL.md) teaches an AI agent to connect this server and use its tools well: which tool to start with, how to write in your brand's voice, first comments, tagging and scheduling. Install it with:
@@ -108,6 +119,7 @@ Every tool, its inputs and the sign-in details are at [buzzmark.ai/ai-apps/mcp](
 
 - Setup guides: https://buzzmark.ai/ai-apps
 - Developer reference: https://buzzmark.ai/ai-apps/mcp
+- CLI: https://docs.buzzmark.ai/ai-apps/cli
 - Support: support@buzzmark.ai
 - Privacy Policy: https://buzzmark.ai/legal/privacy
 - Terms and Conditions: https://buzzmark.ai/legal/terms

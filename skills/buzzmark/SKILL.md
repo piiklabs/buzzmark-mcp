@@ -1,14 +1,14 @@
 ---
 name: buzzmark
 description: Write, plan and schedule social media posts in a business's own voice with Buzzmark's MCP server. Use when the user wants post ideas, posts for Instagram, LinkedIn, Facebook, X, Threads or TikTok, a week of posts planned around their best times, a check on how much a post sounds like their brand, or what worked this month.
-version: 1.0.2
+version: 1.1.0
 homepage: https://buzzmark.ai
 clawdis:
   primaryEnv: BUZZMARK_API_KEY
   envVars:
     - name: BUZZMARK_API_KEY
       required: false
-      description: Personal Buzzmark API key, sent as a Bearer header by agents that can't sign in with OAuth. Made on the AI apps page in Buzzmark.
+      description: Personal Buzzmark API key, sent as a Bearer header by agents that can't sign in with OAuth, and read by the Buzzmark CLI. Made on the AI apps page in Buzzmark.
   homepage: https://buzzmark.ai
 ---
 
@@ -16,7 +16,7 @@ clawdis:
 
 Buzzmark is a ghostwriter that writes, plans and schedules social media posts for founders and growing businesses. It reads the business's website and products first, so the first post already sounds like them, and keeps learning from what they publish and how they edit its drafts.
 
-This skill connects your agent to Buzzmark's remote MCP server and tells it how to use the tools well.
+This skill connects your agent to Buzzmark's remote MCP server, or to the same tools through the Buzzmark CLI, and tells it how to use them well.
 
 ## Setup
 
@@ -47,6 +47,25 @@ Any app with an MCP config file:
 ```
 
 Leave out `headers` when the app signs in with OAuth. Steps for Claude, ChatGPT, Grok and Cursor are at [buzzmark.ai/ai-apps](https://buzzmark.ai/ai-apps).
+
+## Without an MCP client: the command line
+
+An agent with a shell that can't add an MCP server runs the same tools with the Buzzmark CLI (Node.js 22 or later). It reads the key from `BUZZMARK_API_KEY` and nowhere else: never put the key on the command line.
+
+```bash
+npx buzzmark list-social-sets
+npx buzzmark help save-draft
+npx buzzmark save-draft --social-set-id 12 --text "We open at 8 tomorrow."
+npx buzzmark schedule-post --post-id 42 --when best_time
+npx buzzmark upload ./launch.png --post-id 42
+```
+
+- Each command is one of the tools below, with dashes: `schedule-post` runs `schedule_post`. `npx buzzmark tools` lists every one and `npx buzzmark help <tool>` shows its flags.
+- Plain inputs are flags (`--post-id 42`, a list as `--account-ids 3,4`). Nested ones, like a thread or a week of posts, go in as JSON with `--input '{...}'`, or `--input -` to read it from stdin.
+- `upload` adds a file from this machine to the user's Library, and with `--post-id` to that draft.
+- The answer is JSON on stdout. An error is JSON on stderr with a `message`, and the exit code says what kind: 1 the tool said no (tell the user its reason), 2 a wrong command, 3 a missing or refused key, 4 too many calls, 5 Buzzmark couldn't be reached.
+
+Everything below works the same way from the command line.
 
 ## The words Buzzmark uses
 
@@ -98,6 +117,7 @@ When a tool says a limit was reached, tell the user what ran out and when it sta
 - Buzzmark: [buzzmark.ai](https://buzzmark.ai)
 - Setup guides: [buzzmark.ai/ai-apps](https://buzzmark.ai/ai-apps)
 - Every tool and its inputs: [buzzmark.ai/ai-apps/mcp](https://buzzmark.ai/ai-apps/mcp)
+- The CLI: [docs.buzzmark.ai/ai-apps/cli](https://docs.buzzmark.ai/ai-apps/cli)
 - Support: support@buzzmark.ai
 
 Buzzmark is made by Piik Labs AB in Göteborg, Sweden.
