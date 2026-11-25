@@ -1,0 +1,11 @@
+{
+  "name": "buzzmark",
+  "version": "1.2.0",
+  "description": "Write, plan and schedule social media posts in your business's own voice for Instagram, LinkedIn, Facebook, X, Threads and TikTok. Nothing posts right away.",
+  "mcpServers": {
+    "buzzmark": {
+      "httpUrl": "https://buzzmark.ai/mcp"
+    }
+  },
+  "contextFileName": "skills/buzzmark/SKILL.md"
+}
