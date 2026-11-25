@@ -76,6 +76,20 @@ Or from [ClawHub](https://clawhub.ai/buzzmark/skills/buzzmark) for OpenClaw:
 openclaw skills install @buzzmark/buzzmark
 ```
 
+## Install in Gemini CLI
+
+This repository is also a [Gemini CLI](https://geminicli.com) extension: `gemini-extension.json` adds the server and loads the skill in `skills/buzzmark/` as context.
+
+```bash
+gemini extensions install https://github.com/piiklabs/buzzmark-mcp
+```
+
+Start Gemini CLI and run `/mcp auth buzzmark`: your browser opens a Buzzmark page, sign in and allow it. Then ask: "What social accounts do I have in Buzzmark?"
+
+- Every tool call goes to Buzzmark's hosted server at `buzzmark.ai` and acts on the account you sign in to. Gemini CLI keeps the sign-in under `~/.gemini`. There is no key in the extension.
+- Nothing posts right away. Scheduled posts stay on your Buzzmark calendar, where you can change or remove them before they go out.
+- No code, binaries or telemetry in the extension.
+
 ## Install in Hermes Agent
 
 This repository is also a portable Agent Plugins v1 package for [Hermes Agent](https://hermes-agent.nousresearch.com): `plugin.json`, `mcp.json` and the skill in `skills/buzzmark/`.
